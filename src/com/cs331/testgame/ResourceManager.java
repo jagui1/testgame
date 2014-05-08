@@ -9,6 +9,7 @@ import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
 
@@ -26,7 +27,7 @@ public class ResourceManager {
 	
 	private BuildableBitmapTextureAtlas gameTextureAtlas;
 	public ITextureRegion player_region;
-	public ITextureRegion control_knob;
+	public ITiledTextureRegion items_region;
 	
 	private BuildableBitmapTextureAtlas postGameTextureAtlas;
 	public ITextureRegion next_button_region;
@@ -58,7 +59,7 @@ public class ResourceManager {
 				activity.getTextureManager(), 1024, 1024,
 				TextureOptions.BILINEAR);
 		player_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "Player.png");
-		control_knob = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "joystick.png");
+		items_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "targetsprite.png", 12, 1);
 		
 		try {
 			gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
