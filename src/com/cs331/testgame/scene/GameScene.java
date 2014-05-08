@@ -201,7 +201,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public boolean onSceneTouchEvent(final Scene pScene,
 			final TouchEvent pSceneTouchEvent) {
 
-		if (physicsWorld != null) {
+		if (physicsWorld != null ) {
 
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
 				isDrawing = true;
@@ -212,7 +212,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				line = new Line(startX, startY, lastX, lastY, vbom);
 				attachChild(line);
 			}
-			if (isDrawing) {
+			if (isDrawing && validMove(pSceneTouchEvent.getX(), pSceneTouchEvent.getY())) {
 				detachChild(line);
 				lastX = pSceneTouchEvent.getX();
 				lastY = pSceneTouchEvent.getY();
@@ -239,6 +239,18 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 			return true;
 		}
 		return false;
+	}
+	
+	private boolean validMove(float x, float y){
+		if(x >= (CAMERA_WIDTH - 32) || x <= 32){
+			return false;
+		}
+		
+		if(y >= (CAMERA_HEIGHT - 32) || y <= 32){
+			return false;
+		}
+		
+		return true;
 	}
 
 //	public MouseJoint createMouseJoint(final IAreaShape pFace,
