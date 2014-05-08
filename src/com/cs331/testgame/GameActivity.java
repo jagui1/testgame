@@ -20,10 +20,10 @@ public class GameActivity extends BaseGameActivity {
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-		camera = new Camera(0, 0, 480 , 800);
+		camera = new Camera(0, 0, 527 , 800);
 		EngineOptions engineOptions = new EngineOptions(true,
 				ScreenOrientation.PORTRAIT_FIXED, new RatioResolutionPolicy(
-						480, 800), this.camera);
+						527, 800), this.camera);
 		engineOptions.getAudioOptions().setNeedsMusic(true).setNeedsSound(true); //ALLOWS FOR SOUNDS AND SUCH
 		engineOptions.setWakeLockOptions(WakeLockOptions.SCREEN_ON); //KEEPS SCREEN ON
 		engineOptions.getTouchOptions().setNeedsMultiTouch(true);
