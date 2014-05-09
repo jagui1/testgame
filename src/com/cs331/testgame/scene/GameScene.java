@@ -1,7 +1,6 @@
 package com.cs331.testgame.scene;
 
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnAreaTouchListener;
@@ -9,7 +8,6 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.shape.IAreaShape;
 import org.andengine.entity.shape.Shape;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
@@ -17,8 +15,6 @@ import org.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.extension.physics.box2d.util.Vector2Pool;
-import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.util.color.Color;
 import org.andengine.util.debug.Debug;
@@ -29,11 +25,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
-import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
 import com.cs331.testgame.ResourceManager;
 
 public class GameScene extends BaseScene implements IOnSceneTouchListener,
@@ -45,7 +38,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private PhysicsWorld physicsWorld;
 	private Body playerBody;
 	private Sprite playerSprite;
-	private int mFaceCount = 0;
+	private static int playerCount;
+	private static int itemCount;
+	private static int levelI;
 	private static final FixtureDef FIXTURE_DEF = PhysicsFactory
 			.createFixtureDef(1, 0.5f, 0.5f);
 	private float startX;
@@ -70,7 +65,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public void createScene() {
 		setBackground();
 		createHUD();
-		// createControls();
 		createPhysics();
 		createWalls();
 		preparePlayer();
@@ -110,6 +104,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 
 	private void preparePlayer() {
 		charge = 0;
+		playerCount = 0;
 		final FixtureDef playerFixtureDef = PhysicsFactory.createFixtureDef(
 				0.5f, .99f, 0.75f);
 		playerFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
@@ -121,29 +116,30 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				playerSprite, playerBody, true, false));
 		playerBody.setUserData("player");
-
-		// attachChild(playerSprite);
 	}
 	
 	private void addItems() {
+		itemCount = 0;
+		
 		Collectable newItem = new Collectable(50, 75);
-		Collectable newItem2 = new Collectable(75, 500);
-		Collectable newItem3 = new Collectable(250, 500);
-		Collectable newItem4 = new Collectable(20, 700);
-		
-		
-//		final FixtureDef joystickFixtureDef = PhysicsFactory.createFixtureDef(
-//				0.5f, .99f, 0.75f);
-//		joystickFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
-//		joystickFixtureDef.filter.maskBits = MASK_COLLECTABLE;
-//		joystickSprite = createSprite(50, 75,
-//				ResourceManager.getInstance().control_knob, vbom);
-//		joystickBody = PhysicsFactory.createBoxBody(physicsWorld, joystickSprite, BodyType.StaticBody,joystickFixtureDef );
-//		joystickBody.setUserData("item");
+		itemCount++;
 		attachChild(newItem.getSprite());
+		
+		Collectable newItem2 = new Collectable(75, 500);
+		itemCount++;
 		attachChild(newItem2.getSprite());
+		
+		Collectable newItem3 = new Collectable(250, 500);
+		itemCount++;
 		attachChild(newItem3.getSprite());
+		
+		Collectable newItem4 = new Collectable(20, 700);
+		itemCount++;
 		attachChild(newItem4.getSprite());
+		
+		Collectable newItem5 = new Collectable(200, 700);
+		itemCount++;
+		attachChild(newItem5.getSprite());
 		
 	}
 
@@ -202,6 +198,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 			final TouchEvent pSceneTouchEvent) {
 
 		if (physicsWorld != null ) {
+			charge = 0;
 
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
 				isDrawing = true;
@@ -222,7 +219,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				attachChild(line);
 			}
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-				if(mFaceCount < 1) {
+				Debug.d("playerCount = " + playerCount);
+				if(playerCount < 1) {
 					isDrawing = false;
 					addPlayer(lastX - ResourceManager.getInstance().player_region.getWidth() / 2,
 							lastY - ResourceManager.getInstance().player_region.getHeight() / 2);
@@ -253,34 +251,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		return true;
 	}
 
-//	public MouseJoint createMouseJoint(final IAreaShape pFace,
-//			final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-//		final Body body = (Body) pFace.getUserData();
-//		final MouseJointDef mouseJointDef = new MouseJointDef();
-//
-//		final Vector2 localPoint = Vector2Pool.obtain(
-//				(pTouchAreaLocalX - pFace.getWidth() * 0.5f)
-//						/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-//				(pTouchAreaLocalY - pFace.getHeight() * 0.5f)
-//						/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-//		playerBody.setTransform(localPoint, 0);
-//
-//		mouseJointDef.bodyA = playerBody;
-//		mouseJointDef.bodyB = body;
-//		mouseJointDef.dampingRatio = 0.95f;
-//		mouseJointDef.frequencyHz = 60;
-//		mouseJointDef.maxForce = (200.0f * body.getMass());
-//		mouseJointDef.collideConnected = true;
-//
-//		mouseJointDef.target.set(body.getWorldPoint(localPoint));
-//		Vector2Pool.recycle(localPoint);
-//
-//		return (MouseJoint) physicsWorld.createJoint(mouseJointDef);
-//	}
 
 	private void addPlayer(final float pX, final float pY) {
-		this.mFaceCount++;
-
 		playerSprite = new Sprite(pX, pY,
 				ResourceManager.getInstance().player_region, vbom);
 		playerBody = PhysicsFactory.createBoxBody(physicsWorld, playerSprite,
@@ -289,7 +261,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		playerBody.setUserData("player");
 		physicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				playerSprite, playerBody, true, true));
-		//attachChild(playerSprite);
+		playerCount++;
 	}
 	
 	private void removeBody(final Body cBody) {
@@ -300,9 +272,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		    {
 		    	Shape cSprite = cBody.getAttachedSprite();
 		    	physicsWorld.destroyBody(cBody);
+		    	itemCount--;
 		    	detachChild(cSprite);
-		    	charge += 2;
-		    	Debug.d("charge = " + charge);
+		    	charge++;
 		    	
 		    }  
 		});
@@ -334,38 +306,37 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	            }
 	
 	            @Override
-	            public void endContact(Contact contact)
-	            {  
-
-	            }
+	            public void endContact(Contact contact) {  }
 	
 	            @Override
-	            public void preSolve(Contact contact, Manifold oldManifold)
-	            {
+	            public void preSolve(Contact contact, Manifold oldManifold) {
 	            	
+	            	if(playerBody.getLinearVelocity().len() < 2 || itemCount == 0 || charge >= 3 || charge <= -3) {
+	            		playerBody.setAwake(false);
+	            	}
 	            }
 	
 	            @Override
-	            public void postSolve(Contact contact, ContactImpulse impulse)
-	            {  
-
-	            }
+	            public void postSolve(Contact contact, ContactImpulse impulse) { }
 	    };
 	    return contactListener;
 	}
 	
+	/////////////////////////////////////////////////////
+	// WRAPPER CLASS FOR THE COLLECTABLE ITEMS
+	//
 	private class Collectable {
 		private AnimatedSprite cSprite;
 		private Body cBody;
 		
 		public Collectable(int x,int y) {
-			final FixtureDef joystickFixtureDef = PhysicsFactory.createFixtureDef(
+			final FixtureDef cFixtureDef = PhysicsFactory.createFixtureDef(
 					0.5f, .99f, 0.75f);
-			joystickFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
-			joystickFixtureDef.filter.maskBits = MASK_COLLECTABLE;
+			cFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
+			cFixtureDef.filter.maskBits = MASK_COLLECTABLE;
 			cSprite = new AnimatedSprite((float)x, (float)y,
 					ResourceManager.getInstance().items_region, vbom);
-			cBody = PhysicsFactory.createBoxBody(physicsWorld, cSprite, BodyType.StaticBody,joystickFixtureDef );
+			cBody = PhysicsFactory.createBoxBody(physicsWorld, cSprite, BodyType.StaticBody,cFixtureDef );
 			cBody.setUserData("item");
 			cBody.setAttachedSprite(cSprite);	
 			cSprite.animate(175);
@@ -374,11 +345,6 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		Sprite getSprite() {
 			return cSprite;
 		}
-		
-		Body getBody() {
-			return cBody;
-		}
-	
 	}
 
 }
