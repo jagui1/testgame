@@ -38,6 +38,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private PhysicsWorld physicsWorld;
 	private Body playerBody;
 	private Sprite playerSprite;
+	private Sprite chargeBarSprite;
+	private Rectangle cCharge;
 	private static int playerCount;
 	private static int itemCount;
 	private static int levelI;
@@ -55,6 +57,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public static final short CATEGORY_PLAYER = 0x0001;
 	public static final short CATEGORY_COLLECTABLE = 0x0002;
 	public static final short CATEGORY_SCENERY = 0x0004;
+	public static final short CATEGORY_HUD = 0x0008;
 	
 	public static final short MASK_PLAYER = CATEGORY_COLLECTABLE | CATEGORY_SCENERY;
 	public static final short MASK_COLLECTABLE = CATEGORY_PLAYER | CATEGORY_SCENERY;
@@ -93,8 +96,12 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	}
 
 	private void createHUD() {
-		gameHUD = new HUD();
-		camera.setHUD(gameHUD);
+		chargeBarSprite = createSprite(10, 10, ResourceManager.getInstance().charge_bar_region, vbom);
+		attachChild(chargeBarSprite);
+		cCharge = new Rectangle(100, 25, 12,
+				12, vbom);
+		cCharge.setColor(Color.RED);
+		attachChild(cCharge);
 	}
 
 	private void createPhysics() {
@@ -109,13 +116,13 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				0.5f, .99f, 0.75f);
 		playerFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
 		playerFixtureDef.filter.maskBits = MASK_PLAYER;
-		playerSprite = createSprite(0, 0,
-				ResourceManager.getInstance().player_region, vbom);
-		playerBody = PhysicsFactory.createBoxBody(physicsWorld, playerSprite,
-				BodyType.DynamicBody, playerFixtureDef);
-		physicsWorld.registerPhysicsConnector(new PhysicsConnector(
-				playerSprite, playerBody, true, false));
-		playerBody.setUserData("player");
+//		playerSprite = createSprite(0, 0,
+//				ResourceManager.getInstance().player_region, vbom);
+//		playerBody = PhysicsFactory.createBoxBody(physicsWorld, playerSprite,
+//				BodyType.DynamicBody, playerFixtureDef);
+//		physicsWorld.registerPhysicsConnector(new PhysicsConnector(
+//				playerSprite, playerBody, true, false));
+//		playerBody.setUserData("player");
 	}
 	
 	private void addItems() {
@@ -273,8 +280,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		    	Shape cSprite = cBody.getAttachedSprite();
 		    	physicsWorld.destroyBody(cBody);
 		    	itemCount--;
-		    	detachChild(cSprite);
 		    	charge++;
+		    	cCharge.setX(cCharge.getX() + 32);
+		    	detachChild(cSprite);
+		    	if(itemCount == 0)
+		    		playerBody.setAwake(false);
 		    	
 		    }  
 		});
@@ -293,14 +303,17 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	                if(x1.getUserData().equals("item")) {
 	                	x1.setActive(false);
 	                	removeBody(x1);
+	                	Debug.d("itemCount = " + itemCount);
 	                } else if(x2.getUserData().equals("item")) {
 	                	x2.setActive(false);
 	                	removeBody(x2);
 	                } else if(x1.getUserData().equals("player") && x2.getUserData().equals("wall")) {
 	                	charge--;
+	                	cCharge.setX(cCharge.getX() - 32);
 	                	Debug.d("Charge = " + charge);
 	                } else if(x2.getUserData().equals("player") && x1.getUserData().equals("wall")) {
 	                	charge--;
+	                	cCharge.setX(cCharge.getX() - 32);
 	                	Debug.d("Charge = " + charge);
 	                }
 	            }
@@ -310,8 +323,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	
 	            @Override
 	            public void preSolve(Contact contact, Manifold oldManifold) {
-	            	
-	            	if(playerBody.getLinearVelocity().len() < 2 || itemCount == 0 || charge >= 3 || charge <= -3) {
+	            	if(itemCount == 0 || playerBody.getLinearVelocity().len() < 2 || charge >= 3 || charge <= -3) {
 	            		playerBody.setAwake(false);
 	            	}
 	            }
