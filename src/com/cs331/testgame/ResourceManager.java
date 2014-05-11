@@ -24,6 +24,7 @@ public class ResourceManager {
 	private BuildableBitmapTextureAtlas menuTextureAtlas;
 	public ITextureRegion play_button_region;
 	public ITextureRegion exit_button_region;
+	public ITextureRegion info_button_region;	
 	
 	private BuildableBitmapTextureAtlas gameTextureAtlas;
 	public ITextureRegion player_region;
@@ -40,6 +41,8 @@ public class ResourceManager {
 				TextureOptions.BILINEAR);
 		play_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "play.png");
 		exit_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "quit.png");
+		//NEED INFO GRAPHIC
+		info_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "info.png");
 
 		try {
 			menuTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));

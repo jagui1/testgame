@@ -39,6 +39,12 @@ public class SceneManager {
 		setScene(gameScene);
 		currentScene.createScene();
 	}
+	
+	//TODO
+//	public void setInfoScene(){
+//		ResourceManager.getInstance();
+//		
+//	}
 
 	public void setScene(BaseScene scene) {
 		if(currentScene != null)
