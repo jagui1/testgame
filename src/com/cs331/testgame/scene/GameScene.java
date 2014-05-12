@@ -39,6 +39,8 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private Body playerBody;
 	private Sprite playerSprite;
 	private Sprite chargeBarSprite;
+	private Sprite postGameSprite;
+	private Sprite nextButton;
 	private Rectangle cCharge;
 	private static int playerCount;
 	private static int itemCount;
@@ -129,6 +131,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		cCharge = new Rectangle(100, 25, 12, 12, vbom);
 		cCharge.setColor(Color.RED);
 		attachChild(cCharge);
+		
+		postGameSprite = new Sprite(0, 0, ResourceManager.getInstance().post_menu_overlay_region, vbom);
+		nextButton = new Sprite(350, 700, ResourceManager.getInstance().next_button_region, vbom);
 	}
 
 	private void createPhysics() {
@@ -318,13 +323,19 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private void displayPostMenu() {
 		//Check current game status
 		//display some buttons and then load the next level or reload the current one
+		SceneManager.getInstance().getCurrentScene().registerTouchArea(nextButton);
+		attachChild(postGameSprite);
+		attachChild(nextButton);
 		cLevelI++;
+		
 		prepareNextLevel(cLevelI);
 	}
 	
 	private void prepareNextLevel(int x) {
 		Debug.d("cLevelI =" + cLevelI);
 		detachChild(playerSprite);
+		detachChild(postGameSprite);
+		detachChild(nextButton);
 		physicsWorld.destroyBody(playerBody);
 		cCharge.setX(100);
 		charge = 0;
@@ -369,7 +380,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				if (itemCount == 0 || playerBody.getLinearVelocity().len() < 2
 						|| charge >= 3 || charge <= -3) {
 					playerBody.setAwake(false);
-					displayPostMenu();
+					//displayPostMenu();
 				}
 			}
 

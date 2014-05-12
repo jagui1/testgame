@@ -30,6 +30,7 @@ public class ResourceManager {
 	public ITextureRegion player_region;
 	public ITiledTextureRegion items_region;
 	public ITextureRegion charge_bar_region;
+	public ITextureRegion post_menu_overlay_region;
 	
 	private BuildableBitmapTextureAtlas postGameTextureAtlas;
 	public ITextureRegion next_button_region;
@@ -65,6 +66,8 @@ public class ResourceManager {
 		player_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "Player.png");
 		items_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "targetsprite.png", 12, 1);
 		charge_bar_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "charge.png");
+		post_menu_overlay_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "overlay.png");
+		next_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "charge.png");
 
 		try {
 			gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
