@@ -42,7 +42,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private Rectangle cCharge;
 	private static int playerCount;
 	private static int itemCount;
-	private static int levelI;
+	
 	private static final FixtureDef FIXTURE_DEF = PhysicsFactory
 			.createFixtureDef(1, 0.5f, 0.5f);
 	private float startX;
@@ -51,32 +51,59 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private float lastY;
 	private boolean isDrawing = false;
 	private Line line;
-	
 	private static int charge;
+	
+	private static int cLevelI;
+	private final int [][] levelsX = 	{   {200, 200, 200, 200, 200}, //level 1
+											{50, 75, 250, 20, 200}, //level 2
+											{50, 75, 250, 20, 200},	//level 3
+											{50, 75, 250, 20, 200}, //level 4
+											{50, 75, 250, 20, 200}, //level 5
+											{50, 75, 250, 20, 200}, //level 6
+											{50, 75, 250, 20, 200}, //level 7
+											{50, 75, 250, 20, 200}, //level 8
+											{50, 75, 250, 20, 200}, //level 9
+											{50, 75, 250, 20, 200}, //level 10
+								        };
+	
+	private final int [][] levelsY =  {		{75, 225, 375, 525, 675}, //level 1
+		 									{75, 500, 500, 700, 700}, //level 2
+											{75, 500, 500, 700, 700}, //level 3
+											{75, 500, 500, 700, 700}, //level 4
+											{75, 500, 500, 700, 700}, //level 5
+											{75, 500, 500, 700, 700}, //level 6
+											{75, 500, 500, 700, 700}, //level 7
+											{75, 500, 500, 700, 700}, //level 8
+											{75, 500, 500, 700, 700}, //level 9
+											{75, 500, 500, 700, 700}, //level 10
+									  };
+
 
 	public static final short CATEGORY_PLAYER = 0x0001;
 	public static final short CATEGORY_COLLECTABLE = 0x0002;
 	public static final short CATEGORY_SCENERY = 0x0004;
 	public static final short CATEGORY_HUD = 0x0008;
-	
-	public static final short MASK_PLAYER = CATEGORY_COLLECTABLE | CATEGORY_SCENERY;
-	public static final short MASK_COLLECTABLE = CATEGORY_PLAYER | CATEGORY_SCENERY;
+
+	public static final short MASK_PLAYER = CATEGORY_COLLECTABLE
+			| CATEGORY_SCENERY;
+	public static final short MASK_COLLECTABLE = CATEGORY_PLAYER
+			| CATEGORY_SCENERY;
 	public static final short MASK_SCENERY = -1;
-	
-	
+
 	@Override
 	public void createScene() {
+		cLevelI = 0;
 		setBackground();
 		createHUD();
 		createPhysics();
 		createWalls();
 		preparePlayer();
-		addItems();
+		addItems(0);
 		SceneManager.getInstance().getCurrentScene()
 				.setOnSceneTouchListener(this);
 		SceneManager.getInstance().getCurrentScene()
 				.setOnAreaTouchListener(this);
-		
+
 		physicsWorld.setContactListener(cListener());
 	}
 
@@ -96,10 +123,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	}
 
 	private void createHUD() {
-		chargeBarSprite = createSprite(10, 10, ResourceManager.getInstance().charge_bar_region, vbom);
+		chargeBarSprite = createSprite(10, 10,
+				ResourceManager.getInstance().charge_bar_region, vbom);
 		attachChild(chargeBarSprite);
-		cCharge = new Rectangle(100, 25, 12,
-				12, vbom);
+		cCharge = new Rectangle(100, 25, 12, 12, vbom);
 		cCharge.setColor(Color.RED);
 		attachChild(cCharge);
 	}
@@ -116,70 +143,62 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				0.5f, .99f, 0.75f);
 		playerFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
 		playerFixtureDef.filter.maskBits = MASK_PLAYER;
-//		playerSprite = createSprite(0, 0,
-//				ResourceManager.getInstance().player_region, vbom);
-//		playerBody = PhysicsFactory.createBoxBody(physicsWorld, playerSprite,
-//				BodyType.DynamicBody, playerFixtureDef);
-//		physicsWorld.registerPhysicsConnector(new PhysicsConnector(
-//				playerSprite, playerBody, true, false));
-//		playerBody.setUserData("player");
 	}
-	
-	private void addItems() {
+
+	private void addItems(int i) {
 		itemCount = 0;
-		
-		Collectable newItem = new Collectable(50, 75);
+
+		Collectable newItem = new Collectable(levelsX[i][0], levelsY[i][0]);
 		itemCount++;
 		attachChild(newItem.getSprite());
-		
-		Collectable newItem2 = new Collectable(75, 500);
+
+		Collectable newItem2 = new Collectable(levelsX[i][1], levelsY[i][1]);
 		itemCount++;
 		attachChild(newItem2.getSprite());
-		
-		Collectable newItem3 = new Collectable(250, 500);
+
+		Collectable newItem3 = new Collectable(levelsX[i][2], levelsY[i][2]);
 		itemCount++;
 		attachChild(newItem3.getSprite());
-		
-		Collectable newItem4 = new Collectable(20, 700);
+
+		Collectable newItem4 = new Collectable(levelsX[i][3], levelsY[i][3]);
 		itemCount++;
 		attachChild(newItem4.getSprite());
-		
-		Collectable newItem5 = new Collectable(200, 700);
+
+		Collectable newItem5 = new Collectable(levelsX[i][4], levelsY[i][4]);
 		itemCount++;
 		attachChild(newItem5.getSprite());
-		
+
 	}
 
 	private void createWalls() {
 		FixtureDef WALL_FIX = PhysicsFactory.createFixtureDef(0.0f, 0.0f, 0.0f);
 		WALL_FIX.filter.categoryBits = CATEGORY_SCENERY;
 		WALL_FIX.filter.maskBits = MASK_SCENERY;
-		Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 1, CAMERA_WIDTH,
-				1, vbom);
+		Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 1, CAMERA_WIDTH, 1,
+				vbom);
 		ground.setColor(new Color(0, 0, 0));
 		ground.setUserData("ground");
-		Body groundBody = PhysicsFactory.createBoxBody(physicsWorld, ground, BodyType.StaticBody,
-				WALL_FIX);
+		Body groundBody = PhysicsFactory.createBoxBody(physicsWorld, ground,
+				BodyType.StaticBody, WALL_FIX);
 		groundBody.setUserData("wall");
 		attachChild(ground);
 
 		Rectangle leftWall = new Rectangle(0, 0, 1, CAMERA_HEIGHT, vbom);
 		leftWall.setColor(new Color(0, 0, 0));
-		Body leftWallBody = PhysicsFactory.createBoxBody(physicsWorld, leftWall,
-				BodyType.StaticBody, WALL_FIX);
+		Body leftWallBody = PhysicsFactory.createBoxBody(physicsWorld,
+				leftWall, BodyType.StaticBody, WALL_FIX);
 		leftWall.setUserData("leftwall");
 		leftWallBody.setUserData("wall");
 		attachChild(leftWall);
 
-		Rectangle rightWall = new Rectangle(CAMERA_WIDTH -1, 0, 1,
+		Rectangle rightWall = new Rectangle(CAMERA_WIDTH - 1, 0, 1,
 				CAMERA_HEIGHT, vbom);
 		rightWall.setColor(new Color(0, 0, 0));
-		Body rightWallBody = PhysicsFactory.createBoxBody(physicsWorld, rightWall,
-				BodyType.StaticBody, WALL_FIX);
+		Body rightWallBody = PhysicsFactory.createBoxBody(physicsWorld,
+				rightWall, BodyType.StaticBody, WALL_FIX);
 		rightWall.setUserData("rightwall");
 		rightWallBody.setUserData("wall");
 		attachChild(rightWall);
-		
 
 		Rectangle ceiling = new Rectangle(0, 0, CAMERA_WIDTH, 1, vbom);
 		ceiling.setColor(new Color(0, 0, 0));
@@ -191,12 +210,11 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 
 	}
 
-
 	@Override
 	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 			ITouchArea pTouchArea, float pTouchAreaLocalX,
 			float pTouchAreaLocalY) {
-		
+
 		return false;
 	}
 
@@ -204,7 +222,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public boolean onSceneTouchEvent(final Scene pScene,
 			final TouchEvent pSceneTouchEvent) {
 
-		if (physicsWorld != null ) {
+		if (physicsWorld != null) {
 			charge = 0;
 
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
@@ -216,7 +234,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				line = new Line(startX, startY, lastX, lastY, vbom);
 				attachChild(line);
 			}
-			if (isDrawing && validMove(pSceneTouchEvent.getX(), pSceneTouchEvent.getY())) {
+			if (isDrawing
+					&& validMove(pSceneTouchEvent.getX(),
+							pSceneTouchEvent.getY())) {
 				detachChild(line);
 				lastX = pSceneTouchEvent.getX();
 				lastY = pSceneTouchEvent.getY();
@@ -227,10 +247,15 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 			}
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
 				Debug.d("playerCount = " + playerCount);
-				if(playerCount < 1) {
+				if (playerCount < 1) {
 					isDrawing = false;
-					addPlayer(lastX - ResourceManager.getInstance().player_region.getWidth() / 2,
-							lastY - ResourceManager.getInstance().player_region.getHeight() / 2);
+					addPlayer(
+							lastX
+									- ResourceManager.getInstance().player_region.getWidth()
+									/ 2,
+							lastY
+									- ResourceManager.getInstance().player_region
+											.getHeight() / 2);
 					Vector2 vec = new Vector2(startX - lastX, startY - lastY);
 					attachChild(playerSprite);
 					playerBody.setLinearVelocity(vec);
@@ -245,19 +270,18 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		}
 		return false;
 	}
-	
-	private boolean validMove(float x, float y){
-		if(x >= (CAMERA_WIDTH - 32) || x <= 32){
+
+	private boolean validMove(float x, float y) {
+		if (x >= (CAMERA_WIDTH - 32) || x <= 32) {
 			return false;
 		}
-		
-		if(y >= (CAMERA_HEIGHT - 32) || y <= 32){
+
+		if (y >= (CAMERA_HEIGHT - 32) || y <= 32) {
 			return false;
 		}
-		
+
 		return true;
 	}
-
 
 	private void addPlayer(final float pX, final float pY) {
 		playerSprite = new Sprite(pX, pY,
@@ -270,90 +294,113 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				playerSprite, playerBody, true, true));
 		playerCount++;
 	}
-	
+
 	private void removeBody(final Body cBody) {
-		engine.runOnUpdateThread(new Runnable()
-		{
-		    @Override
-		    public void run()
-		    {
-		    	Shape cSprite = cBody.getAttachedSprite();
-		    	physicsWorld.destroyBody(cBody);
-		    	itemCount--;
-		    	charge++;
-		    	cCharge.setX(cCharge.getX() + 32);
-		    	detachChild(cSprite);
-		    	if(itemCount == 0)
-		    		playerBody.setAwake(false);
-		    	
-		    }  
+		engine.runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {
+				Shape cSprite = cBody.getAttachedSprite();
+				physicsWorld.destroyBody(cBody);
+				itemCount--;
+				charge++;
+				cCharge.setX(cCharge.getX() + 32);
+				detachChild(cSprite);
+				if (itemCount == 0) {
+					playerBody.setAwake(false);
+					displayPostMenu();
+				}
+					
+
+			}
 		});
 	}
 	
-	private ContactListener cListener() {
-		ContactListener contactListener = new ContactListener()
-	    {
-			
-	            @Override
-	            public void beginContact(Contact contact)
-	            {   
-	                Body x1 = contact.getFixtureA().getBody();
-	                Body x2 = contact.getFixtureB().getBody();
-	                
-	                if(x1.getUserData().equals("item")) {
-	                	x1.setActive(false);
-	                	removeBody(x1);
-	                	Debug.d("itemCount = " + itemCount);
-	                } else if(x2.getUserData().equals("item")) {
-	                	x2.setActive(false);
-	                	removeBody(x2);
-	                } else if(x1.getUserData().equals("player") && x2.getUserData().equals("wall")) {
-	                	charge--;
-	                	cCharge.setX(cCharge.getX() - 32);
-	                	Debug.d("Charge = " + charge);
-	                } else if(x2.getUserData().equals("player") && x1.getUserData().equals("wall")) {
-	                	charge--;
-	                	cCharge.setX(cCharge.getX() - 32);
-	                	Debug.d("Charge = " + charge);
-	                }
-	            }
-	
-	            @Override
-	            public void endContact(Contact contact) {  }
-	
-	            @Override
-	            public void preSolve(Contact contact, Manifold oldManifold) {
-	            	if(itemCount == 0 || playerBody.getLinearVelocity().len() < 2 || charge >= 3 || charge <= -3) {
-	            		playerBody.setAwake(false);
-	            	}
-	            }
-	
-	            @Override
-	            public void postSolve(Contact contact, ContactImpulse impulse) { }
-	    };
-	    return contactListener;
+	private void displayPostMenu() {
+		//Check current game status
+		//display some buttons and then load the next level or reload the current one
+		cLevelI++;
+		prepareNextLevel(cLevelI);
 	}
 	
-	/////////////////////////////////////////////////////
+	private void prepareNextLevel(int x) {
+		Debug.d("cLevelI =" + cLevelI);
+		detachChild(playerSprite);
+		physicsWorld.destroyBody(playerBody);
+		cCharge.setX(100);
+		charge = 0;
+		playerCount = 0;
+		addItems(x);
+	}
+
+	private ContactListener cListener() {
+		ContactListener contactListener = new ContactListener() {
+
+			@Override
+			public void beginContact(Contact contact) {
+				Body x1 = contact.getFixtureA().getBody();
+				Body x2 = contact.getFixtureB().getBody();
+
+				if (x1.getUserData().equals("item")) {
+					x1.setActive(false);
+					removeBody(x1);
+					Debug.d("itemCount = " + itemCount);
+				} else if (x2.getUserData().equals("item")) {
+					x2.setActive(false);
+					removeBody(x2);
+				} else if (x1.getUserData().equals("player")
+						&& x2.getUserData().equals("wall")) {
+					charge--;
+					cCharge.setX(cCharge.getX() - 32);
+					Debug.d("Charge = " + charge);
+				} else if (x2.getUserData().equals("player")
+						&& x1.getUserData().equals("wall")) {
+					charge--;
+					cCharge.setX(cCharge.getX() - 32);
+					Debug.d("Charge = " + charge);
+				}
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				if (itemCount == 0 || playerBody.getLinearVelocity().len() < 2
+						|| charge >= 3 || charge <= -3) {
+					playerBody.setAwake(false);
+					displayPostMenu();
+				}
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+			}
+		};
+		return contactListener;
+	}
+
+	// ///////////////////////////////////////////////////
 	// WRAPPER CLASS FOR THE COLLECTABLE ITEMS
 	//
 	private class Collectable {
 		private AnimatedSprite cSprite;
 		private Body cBody;
-		
-		public Collectable(int x,int y) {
+
+		public Collectable(int x, int y) {
 			final FixtureDef cFixtureDef = PhysicsFactory.createFixtureDef(
 					0.5f, .99f, 0.75f);
 			cFixtureDef.filter.categoryBits = CATEGORY_COLLECTABLE;
 			cFixtureDef.filter.maskBits = MASK_COLLECTABLE;
-			cSprite = new AnimatedSprite((float)x, (float)y,
+			cSprite = new AnimatedSprite((float) x, (float) y,
 					ResourceManager.getInstance().items_region, vbom);
-			cBody = PhysicsFactory.createBoxBody(physicsWorld, cSprite, BodyType.StaticBody,cFixtureDef );
+			cBody = PhysicsFactory.createBoxBody(physicsWorld, cSprite,
+					BodyType.StaticBody, cFixtureDef);
 			cBody.setUserData("item");
-			cBody.setAttachedSprite(cSprite);	
+			cBody.setAttachedSprite(cSprite);
 			cSprite.animate(175);
 		}
-		
+
 		Sprite getSprite() {
 			return cSprite;
 		}
