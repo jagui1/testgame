@@ -58,7 +58,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private static int cLevelI;
 	private final int [][] levelsX = 	{   {200, 200, 200, 200, 200}, //level 1
 											{50, 75, 250, 20, 200}, //level 2
-											{50, 75, 250, 20, 200},	//level 3
+											{50, 55, 50, 20, 200},	//level 3
 											{50, 75, 250, 20, 200}, //level 4
 											{50, 75, 250, 20, 200}, //level 5
 											{50, 75, 250, 20, 200}, //level 6
@@ -380,7 +380,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				if (itemCount == 0 || playerBody.getLinearVelocity().len() < 2
 						|| charge >= 3 || charge <= -3) {
 					playerBody.setAwake(false);
-					//displayPostMenu();
+					displayPostMenu();
 				}
 			}
 

@@ -8,6 +8,7 @@ import com.cs331.testgame.ResourceManager;
 public class SceneManager {
 	private BaseScene menuScene;
 	private BaseScene gameScene;
+	private BaseScene infoScene;
 
 	private static final SceneManager INSTANCE = new SceneManager();
 
@@ -40,11 +41,13 @@ public class SceneManager {
 		currentScene.createScene();
 	}
 	
-	//TODO
-//	public void setInfoScene(){
-//		ResourceManager.getInstance();
-//		
-//	}
+	public void setInfoScene(){
+		ResourceManager.getInstance().loadInfoResources();
+		infoScene = new InfoScene();
+		setScene(infoScene);
+		currentScene.createScene();
+		
+	}
 
 	public void setScene(BaseScene scene) {
 		if(currentScene != null)
