@@ -54,6 +54,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private boolean isDrawing = false;
 	private Line line;
 	private static int charge;
+	private static boolean levelReady;
 	
 	private static int cLevelI;
 	private final int [][] levelsX = 	{   {200, 200, 200, 200, 200}, //level 1
@@ -95,6 +96,9 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	@Override
 	public void createScene() {
 		cLevelI = 0;
+		levelReady = true;
+		playerCount = 0;
+		charge = 0;
 		setBackground();
 		createHUD();
 		createPhysics();
@@ -132,8 +136,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		cCharge.setColor(Color.RED);
 		attachChild(cCharge);
 		
+		//POST MENU STUFF
 		postGameSprite = new Sprite(0, 0, ResourceManager.getInstance().post_menu_overlay_region, vbom);
-		nextButton = new Sprite(350, 700, ResourceManager.getInstance().next_button_region, vbom);
+		nextButton = new Sprite(150, 700, ResourceManager.getInstance().next_button_region, vbom);
+		SceneManager.getInstance().getCurrentScene().registerTouchArea(nextButton);
 	}
 
 	private void createPhysics() {
@@ -219,6 +225,15 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
 			ITouchArea pTouchArea, float pTouchAreaLocalX,
 			float pTouchAreaLocalY) {
+		if(pSceneTouchEvent.isActionUp()) {
+			if((pTouchAreaLocalX > nextButton.getScaleX()) && 
+					(pTouchAreaLocalX < nextButton.getScaleX() + nextButton.getWidth()) &&
+					(pTouchAreaLocalY > nextButton.getScaleY()) &&
+					(pTouchAreaLocalY < nextButton.getScaleY() + nextButton.getHeight())) {
+				
+				prepareNextLevel(cLevelI);
+			}
+		}
 
 		return false;
 	}
@@ -227,7 +242,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	public boolean onSceneTouchEvent(final Scene pScene,
 			final TouchEvent pSceneTouchEvent) {
 
-		if (physicsWorld != null) {
+		if (physicsWorld != null && levelReady) {
 			charge = 0;
 
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
@@ -250,7 +265,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				line.setColor(0, 0, 0);
 				attachChild(line);
 			}
-			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
+			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP && isDrawing ) {
 				Debug.d("playerCount = " + playerCount);
 				if (playerCount < 1) {
 					isDrawing = false;
@@ -320,27 +335,54 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		});
 	}
 	
+	private void displayLoserPostMenu() {
+		engine.runOnUpdateThread(new Runnable() {
+
+			@Override
+			public void run() {
+			    getTouchAreas().clear();
+		        detachChildren();
+		        physicsWorld.clearPhysicsConnectors();
+		        unregisterUpdateHandler(physicsWorld);
+			    disposeScene();
+			    ResourceManager.getInstance().loadGameResources();
+				playerCount = 0;
+				charge = 0;
+				createScene();
+			}
+		});
+		
+	}
+	
 	private void displayPostMenu() {
 		//Check current game status
 		//display some buttons and then load the next level or reload the current one
-		SceneManager.getInstance().getCurrentScene().registerTouchArea(nextButton);
+		
+		levelReady = false;
 		attachChild(postGameSprite);
 		attachChild(nextButton);
 		cLevelI++;
 		
-		prepareNextLevel(cLevelI);
+		//prepareNextLevel(cLevelI);
 	}
 	
-	private void prepareNextLevel(int x) {
-		Debug.d("cLevelI =" + cLevelI);
-		detachChild(playerSprite);
-		detachChild(postGameSprite);
-		detachChild(nextButton);
-		physicsWorld.destroyBody(playerBody);
-		cCharge.setX(100);
-		charge = 0;
-		playerCount = 0;
-		addItems(x);
+	private void prepareNextLevel(final int x) {
+		engine.runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {
+			Debug.d("cLevelI =" + cLevelI);
+			detachChild(playerSprite);
+			detachChild(postGameSprite);
+			detachChild(nextButton);
+			
+			physicsWorld.destroyBody(playerBody);
+			cCharge.setX(100);
+			charge = 0;
+			playerCount = 0;
+			addItems(x);
+			levelReady = true;
+			}
+		});
 	}
 
 	private ContactListener cListener() {
@@ -380,7 +422,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				if (itemCount == 0 || playerBody.getLinearVelocity().len() < 2
 						|| charge >= 3 || charge <= -3) {
 					playerBody.setAwake(false);
-					//displayPostMenu();
+					displayLoserPostMenu();
 				}
 			}
 
