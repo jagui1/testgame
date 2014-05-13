@@ -25,6 +25,7 @@ public class ResourceManager {
 	public ITextureRegion play_button_region;
 	public ITextureRegion exit_button_region;
 	public ITextureRegion info_button_region;	
+	public ITextureRegion logo_region;	
 	
 	private BuildableBitmapTextureAtlas infoTextureAtlas;
 	public ITextureRegion info_page_region;
@@ -34,6 +35,9 @@ public class ResourceManager {
 	public ITiledTextureRegion items_region;
 	public ITextureRegion charge_bar_region;
 	public ITextureRegion post_menu_overlay_region;
+	public ITextureRegion end_menu_overlay_region;
+	public ITextureRegion meter_mark_region;
+	public ITextureRegion game_exit_button_region;
 	
 	private BuildableBitmapTextureAtlas postGameTextureAtlas;
 	public ITextureRegion next_button_region;
@@ -47,7 +51,9 @@ public class ResourceManager {
 		play_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "play.png");
 		exit_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "quit.png");
 		//NEED INFO GRAPHIC
-		info_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "info.png");
+		info_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "instructions.png");
+		logo_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(menuTextureAtlas, activity, "logo.png");
+		
 
 		try {
 			menuTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
@@ -64,14 +70,16 @@ public class ResourceManager {
 
 	public void loadGameResources() {
 		gameTextureAtlas = new BuildableBitmapTextureAtlas(
-				activity.getTextureManager(), 1024, 1024,
+				activity.getTextureManager(), 4096, 4096,
 				TextureOptions.BILINEAR);
 		player_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "Player.png");
 		items_region = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(gameTextureAtlas, activity, "targetsprite.png", 12, 1);
 		charge_bar_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "charge.png");
-		post_menu_overlay_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "overlay.png");
+		post_menu_overlay_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "Victory.png");
+		end_menu_overlay_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "GameBeat.png");
 		next_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "next.png");
-
+		meter_mark_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "metermarker.png");
+		game_exit_button_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(gameTextureAtlas, activity, "exit.png");
 		try {
 			gameTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
 			gameTextureAtlas.load();

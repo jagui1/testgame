@@ -6,6 +6,7 @@ import org.andengine.entity.scene.menu.MenuScene.IOnMenuItemClickListener;
 import org.andengine.entity.scene.menu.item.IMenuItem;
 import org.andengine.entity.scene.menu.item.SpriteMenuItem;
 import org.andengine.entity.scene.menu.item.decorator.ScaleMenuItemDecorator;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.util.color.Color;
 
 import com.cs331.testgame.ResourceManager;
@@ -17,10 +18,13 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 	private final int MENU_PLAY = 0;
 	private final int MENU_INFO = 1;
 	private final int MENU_EXIT = 2;
+	private Sprite logoSprite;
 
 	@Override
 	public void createScene() {
 		setBackground(new Background(Color.WHITE));
+		logoSprite = createSprite(32, 32, ResourceManager.getInstance().logo_region, vbom);
+		attachChild(logoSprite);
 		createMenu();
 
 	}
@@ -57,8 +61,9 @@ public class MainMenuScene extends BaseScene implements IOnMenuItemClickListener
 		
 		menu.buildAnimations();
 		menu.setBackgroundEnabled(false);
-		playItem.setPosition(playItem.getX(), playItem.getY() - 20);
-		exitItem.setPosition(exitItem.getX(), exitItem.getY());
+		playItem.setPosition(playItem.getX(), playItem.getY() + 60);
+		infoItem.setPosition(infoItem.getX(), infoItem.getY() + 80);
+		exitItem.setPosition(exitItem.getX(), exitItem.getY() + 100);
 		
 		menu.setOnMenuItemClickListener(this);
 		setChildScene(menu);
