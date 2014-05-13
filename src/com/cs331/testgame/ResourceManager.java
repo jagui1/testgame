@@ -26,6 +26,9 @@ public class ResourceManager {
 	public ITextureRegion exit_button_region;
 	public ITextureRegion info_button_region;	
 	
+	private BuildableBitmapTextureAtlas infoTextureAtlas;
+	public ITextureRegion info_page_region;
+	
 	private BuildableBitmapTextureAtlas gameTextureAtlas;
 	public ITextureRegion player_region;
 	public ITiledTextureRegion items_region;
@@ -76,7 +79,7 @@ public class ResourceManager {
 			Debug.e(e);
 		}
 	}
-	
+
 	public void unloadGameResources() {
 		gameTextureAtlas.unload();
 		gameTextureAtlas = null;
@@ -105,6 +108,30 @@ public class ResourceManager {
 	public void loadFonts() {
 
 	}
+	
+	public void loadInfoResources() {
+		infoTextureAtlas = new BuildableBitmapTextureAtlas(
+				activity.getTextureManager(), 1024, 1024,
+				TextureOptions.BILINEAR);
+
+		info_page_region = BitmapTextureAtlasTextureRegionFactory.createFromAsset(infoTextureAtlas, activity, "infobackground.png");
+
+		
+		try {
+			infoTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+			infoTextureAtlas.load();
+			
+		} catch (Exception e) {
+			Debug.e(e);
+		}
+	}
+	
+	public void unloadInfoResources() {
+
+		infoTextureAtlas.unload();
+		infoTextureAtlas = null;
+	}
+	
 
 	public static void prepareManager(Engine engine, GameActivity activity,
 			Camera camera, VertexBufferObjectManager vbom) {
