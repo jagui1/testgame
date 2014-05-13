@@ -59,26 +59,26 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 	private static int cLevelI;
 	private final int [][] levelsX = 	{   {200, 200, 200, 200, 200}, //level 1
 											{50, 75, 250, 20, 200}, //level 2
-											{50, 55, 50, 20, 200},	//level 3
-											{50, 75, 250, 20, 200}, //level 4
-											{50, 75, 250, 20, 200}, //level 5
-											{50, 75, 250, 20, 200}, //level 6
-											{50, 75, 250, 20, 200}, //level 7
-											{50, 75, 250, 20, 200}, //level 8
-											{50, 75, 250, 20, 200}, //level 9
-											{50, 75, 250, 20, 200}, //level 10
+											{32, 128, 224, 320, 417},	//level 3
+											{200, 200, 200, 296, 104}, //level 4
+											{200, 431, 200, 32, 200}, //level 5
+											{32, 128, 224, 320, 417}, //level 6
+											{32, 64, 200, 400, 350}, //level 7
+											{64, 192, 320, 128, 256}, //level 8
+											{350, 64, 200, 350, 300}, //level 9
+											{72, 230, 400, 230, 128}, //level 10
 								        };
 	
 	private final int [][] levelsY =  {		{75, 225, 375, 525, 675}, //level 1
 		 									{75, 500, 500, 700, 700}, //level 2
-											{75, 500, 500, 700, 700}, //level 3
-											{75, 500, 500, 700, 700}, //level 4
-											{75, 500, 500, 700, 700}, //level 5
-											{75, 500, 500, 700, 700}, //level 6
-											{75, 500, 500, 700, 700}, //level 7
-											{75, 500, 500, 700, 700}, //level 8
-											{75, 500, 500, 700, 700}, //level 9
-											{75, 500, 500, 700, 700}, //level 10
+											{368, 368, 368, 368, 368}, //level 3
+											{200, 500, 600, 500, 500}, //level 4
+											{64, 214, 364, 514, 664}, //level 5
+											{100, 100, 368, 700, 700}, //level 6
+											{32, 620, 400, 620, 128}, //level 7
+											{64, 64, 64, 650, 650}, //level 8
+											{75, 400, 200, 250, 650}, //level 9
+											{350, 200, 350, 500, 700}, //level 10
 									  };
 
 
@@ -104,7 +104,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		createPhysics();
 		createWalls();
 		preparePlayer();
-		addItems(0);
+		addItems(cLevelI);
 		createTouchListeners();
 
 		physicsWorld.setContactListener(cListener());
@@ -234,8 +234,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 					(pTouchAreaLocalX < nextButton.getScaleX() + nextButton.getWidth()) &&
 					(pTouchAreaLocalY > nextButton.getScaleY()) &&
 					(pTouchAreaLocalY < nextButton.getScaleY() + nextButton.getHeight())) {
-
-				loadNextLevel();
+				if( cLevelI < 10)
+					loadNextLevel();
+				else
+					System.exit(0);
 			}
 		}
 
@@ -247,7 +249,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 			final TouchEvent pSceneTouchEvent) {
 
 		if (physicsWorld != null && levelReady) {
-			charge = 0;
+			
 
 			if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
 				isDrawing = true;
@@ -282,12 +284,20 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 											.getHeight() / 2);
 					Vector2 vec = new Vector2(startX - lastX, startY - lastY);
 					attachChild(playerSprite);
+					charge = 0;
+					cCharge.setX(100);
 					playerBody.setLinearVelocity(vec);
 					playerBody.setLinearDamping(0.2f);
 					playerBody.setAngularDamping(0.2f);
 					playerBody.setUserData("player");
 				}
 				detachChild(line);
+				
+				if (itemCount == 0 || playerBody.getLinearVelocity().len() < 2
+						|| charge >= 3 || charge <= -3) {
+					playerBody.setAwake(false);
+					loadNextLevel();
+				}
 
 			}
 			return true;
@@ -358,6 +368,7 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 
 			@Override
 			public void run() {
+
 			    getTouchAreas().clear();
 		        detachChildren();
 		        physicsWorld.clearPhysicsConnectors();
@@ -373,7 +384,10 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 				createPhysics();
 				createWalls();
 				preparePlayer();
-				addItems(cLevelI);
+				if(cLevelI < 10)
+					addItems(cLevelI);
+				else 
+					displayGameOverMenu();
 				createTouchListeners();
 
 				physicsWorld.setContactListener(cListener());
@@ -391,6 +405,15 @@ public class GameScene extends BaseScene implements IOnSceneTouchListener,
 		attachChild(postGameSprite);
 		attachChild(nextButton);
 		cLevelI++;
+	}
+	
+	private void displayGameOverMenu() {
+		//Check current game status
+		//display some buttons and then load the next level or reload the current one
+		
+		levelReady = false;
+		attachChild(postGameSprite);
+		attachChild(nextButton);
 	}
 
 
