@@ -1,4 +1,5 @@
-testgame
-========
+*STATIC BOUNCE*
 
-cs331 android game
+An android application developed for CMSC 331 at UMBC
+
+Created by: Jeremy Aguillon, John Black, Tristan Adams
